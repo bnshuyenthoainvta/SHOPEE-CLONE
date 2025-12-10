@@ -18,6 +18,9 @@ const userSchema = schema({
         type: String,
         required: true
     },
+    refreshToken: {
+        type: String
+    },
     roles: {
         type: String,
         enum: ["admin", "seller", "buyer"],
@@ -55,6 +58,7 @@ userSchema.methods.verifyPassword = async function (inputPassword) {
 };
 
 //Optional index
-userSchema.index({createdAt: -1});
+userSchema.index({email: 1}); //Sắp xếp các user theo thứ tự thuộc tính email tăng theo thứ tự từ điển
+userSchema.index({createdAt: -1}); //Sắp xếp các user vào btree theo thứ tự thời gian mới nhất trở về trước
 
 module.exports = mongoose.model('Users', userSchema);
