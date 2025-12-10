@@ -28,13 +28,13 @@ const auth = async (req, res) => {
         const match = await foundUser.verifyPassword(password);
         if(!match) return res.status(404).json({success: false, message: "Password incorrect"});
 
-        const refreshToken = await jwt.sign(
+        const refreshToken = jwt.sign(
             {email: foundUser.email},
             process.env.REFRESH_SECRET_TOKEN,
-            {expiresIn: '10m'}
+            {expiresIn: '10d'}
         );
 
-        const accessToken = await jwt.sign(
+        const accessToken = jwt.sign(
             {
                 user: {
                     email: foundUser.email,
@@ -42,13 +42,13 @@ const auth = async (req, res) => {
                 }
             },
             process.env.ACCESS_SECRET_TOKEN,
-            {expiresIn: '10d'}
+            {expiresIn: '10m'}
         );
 
         res.cookie(
-            "accessToken",
-            accessToken,
-            {httpOnly: true}
+            "refreshToken",
+            refreshToken,
+            {httpOnly: true, maxAge: 10*24*60*60*1000}
         );
 
         foundUser.refreshToken = refreshToken;

@@ -2,10 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const userRouter = require('./route/User');
-
 const app = express();
 const PORT = 3500;
+
+//Link router
+const userRouter = require('./route/User');
+
+//Link middleware
+const verifyToken = require('./middleware/verifyToken');
 
 //Important Middleware
 app.use(express.urlencoded({extended: true}));
@@ -24,6 +28,9 @@ DBconnect();
 
 //Router
 app.use('/api/user', userRouter);
+
+//Verify Middleware
+app.use(verifyToken);
 
 // Start server
 app.listen(PORT, () => {
