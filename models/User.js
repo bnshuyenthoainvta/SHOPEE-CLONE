@@ -1,64 +1,72 @@
-const mongoose = require('mongoose');
-const schema = mongoose.Schema;
-const argon2 = require('argon2');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const userSchema = schema({
-    name: {
-        type: String,
-        trim: true
-    },
-    email: {
-        type: String,
-        required: [true, "Provide valid email"],
-        unique: true,
-        lowercase: true,
-        match: [/^\S+@\S+\.\S+$/, "Invalid email format"]
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    refreshToken: {
-        type: String
-    },
-    roles: {
-        type: String,
-        enum: ["admin", "seller", "buyer"],
-        default: "buyer",
-        require: true
-    },
-    money: {
-        type: Number,
-        default: 0,
-        require: true
-    },
-    phone: {
-        type: String
-    },
-    address: {
-        type: String
-    }
-}, { timestamps: true });
+const { Schema } = mongoose;
 
-//tackle password before save
-userSchema.pre('save', async function (next) {
-    if(!this.isModified("password")) return next();
-    
-    try {
-        this.password = await argon2.hash(this.password);
-        next();
-    } catch (err) {
-        next(err);
-    }
+// Address schema
+const addressSchema = new Schema({
+  fullName: { type: String, required: true },
+  phone: { type: String, required: true },
+  address: { type: String, required: true },
+  city: { type: String, required: true },
+  district: { type: String, required: true },
+  ward: { type: String, required: true },
+  isDefault: { type: Boolean, default: false },
 });
 
-//Method compare password
-userSchema.methods.verifyPassword = async function (inputPassword) {
-    return await argon2.verify(this.password, inputPassword);
+// User schema
+const userSchema = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      select: false,
+    },
+    name: {
+      type: String,
+      // required: true,
+      trim: true,
+    },
+    avatar: String,
+    phone: {
+      type: String,
+      trim: true,
+    },
+    role: {
+      type: String,
+      enum: ["buyer", "seller", "admin"],
+      default: "buyer"
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationToken: String,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    addresses: [addressSchema],
+  },
+  {
+    timestamps: true,
+  }
+);
+
+// Compare password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
-//Optional index
-userSchema.index({email: 1}); //Sắp xếp các user theo thứ tự thuộc tính email tăng theo thứ tự từ điển
-userSchema.index({createdAt: -1}); //Sắp xếp các user vào btree theo thứ tự thời gian mới nhất trở về trước
+// Indexes
+// userSchema.index({ email: 1 });
+userSchema.index({ role: 1 });
 
-module.exports = mongoose.model('Users', userSchema);
+module.exports = mongoose.model("User", userSchema);
