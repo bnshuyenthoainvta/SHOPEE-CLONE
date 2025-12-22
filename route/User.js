@@ -3,12 +3,14 @@ const router = express.Router();
 const userController = require('../controller/userController');
 
 //Register
-router.get('/', userController);
+router.post('/register', userController.registerUser);
 //Auth
-router.post('/', userController);
+router.post('/auth', userController.authUser);
 //Update
-router.put('/', userController);
+router.put('/update', userController.updateUser);
 //Delete
-router.delete('/', userController);
+router.delete('/delete/:id', userController.deleteUser);
+//Reset token
+router.get('/refresh', userController.resetAccessToken);
 
 module.exports = router;

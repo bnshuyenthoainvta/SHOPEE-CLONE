@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const argon2 = require("argon2");
 
 const { Schema } = mongoose;
 
@@ -60,13 +60,20 @@ const userSchema = new Schema(
   }
 );
 
+//hash password
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+
+  this.password = await argon2.hash(this.password);
+});
+
 // Compare password
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+  return argon2.verify(this.password, candidatePassword);
 };
 
 // Indexes
-// userSchema.index({ email: 1 });
+userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 
 module.exports = mongoose.model("User", userSchema);

@@ -1,0 +1,30 @@
+//Register User
+POST http://www.localhost:3500/api/user/register/
+Content-Type: application/json
+
+{
+    "email": "tuananh@gmail.com",
+    "password": "tuananh"
+}
+
+###
+//Auth user
+POST http://www.localhost:3500/api/user/auth/
+Content-Type: application/json
+
+{
+    "email": "tuananh@gmail.com",
+    "password": "tuananh"
+}
+
+###
+//Test verify token
+GET http://www.localhost:3500/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY5NDI2Njk2NjMwZTkwMzUzYjhkMDk2YSJ9LCJpYXQiOjE3NjU5NjA5ODUsImV4cCI6MTc2NTk2MTU4NX0.T1fxisksF5tKxWMNiR087pkzgfUuLt0galEF3r0VCAU
+
+
+###
+//Refresh accesstoken
+GET http://www.localhost:3500/api/user/refresh/
+
+

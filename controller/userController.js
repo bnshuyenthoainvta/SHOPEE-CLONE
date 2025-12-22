@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Refreshtoken= require('../models/Refreshtoken');
 const jwt = require('jsonwebtoken');
 const argon2 = require('argon2');
 
@@ -23,14 +24,14 @@ const authUser = async (req, res) => {
         const {email, password} = req.body;
         if(!email || !password) return res.status(400).json({success: false, message: "Email and password are required"});
 
-        const foundUser = await User.findOne({email}).exec();
+        const foundUser = await User.findOne({email}).select("password");
         if(!foundUser) return res.status(404).json({success: false, message: "User not found"});
 
-        const match = await foundUser.verifyPassword(password);
+        const match = await foundUser.comparePassword(password);
         if(!match) return res.status(404).json({success: false, message: "Password incorrect"});
 
         const refreshToken = jwt.sign(
-            {email: foundUser.email},
+            {userId: foundUser._id.toString()},
             process.env.REFRESH_SECRET_TOKEN,
             {expiresIn: '10d'}
         );
@@ -52,8 +53,11 @@ const authUser = async (req, res) => {
             {httpOnly: true, maxAge: 10*24*60*60*1000}
         );
 
-        foundUser.refreshToken = refreshToken;
-        await foundUser.save();
+        await Refreshtoken.create({
+            token: refreshToken, 
+            user: foundUser._id,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        });
 
         return res.status(200).json({success: true, message: "Log in successfully", accessToken});
     } catch (err) {
@@ -111,4 +115,35 @@ const deleteUser = async (req, res) => {
     }
 }
 
-module.exports = { registerUser, authUser, updateUser, deleteUser };
+const resetAccessToken = async (req, res) => {
+    try {
+        const token = req.cookies.refreshToken;
+        if(!token) return res.status(401).json({success: false, message: "Refresh token missing"});
+
+        const decoded = jwt.verify(token, process.env.REFRESH_SECRET_TOKEN);
+
+        const foundToken = await Refreshtoken.findOne({token}).populate("user");
+        if(!foundToken) return res.status(404).json({success: false, message: "Refresh token not found"});
+
+        if (decoded.userId !== foundToken.user._id.toString()) return res.status(409).json({success: false, message: "Conflict information"});
+
+        const accessToken = jwt.sign(
+            {
+                user : 
+                {
+                    email: foundToken.user.email,
+                    userId: foundToken.user._id
+                }
+            },
+            process.env.ACCESS_SECRET_TOKEN,
+            {expiresIn: "10m"}
+        );
+
+        return res.status(200).json({success: true, message: "Created new access token successfully", accessToken});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({success: false, message: "Internal sever error"});
+    }
+}
+
+module.exports = { registerUser, authUser, updateUser, deleteUser, resetAccessToken };
