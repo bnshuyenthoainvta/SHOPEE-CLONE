@@ -9,6 +9,8 @@ const PORT = 3500;
 //Link router
 const userRouter = require('./route/User');
 const categoryRouter = require("./route/Category");
+const productRouter = require("./route/Product");
+const cartRouter = require("./route/Cart");
 
 //Link middleware
 const verifyToken = require('./middleware/verifyToken');
@@ -18,7 +20,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-//Connected DB
+//Connected mongoose DB
 const DBconnect = async() => {
     try {
         await mongoose.connect(process.env.MONGOOSE_URI);
@@ -29,18 +31,18 @@ const DBconnect = async() => {
 };
 DBconnect();
 
-//Main router
+//User router
 app.use('/api/user', userRouter);
-app.use('/api/category', categoryRouter);
 
 //Verify Middleware
 app.use(verifyToken);
 
-app.get('/', (req,res) => {
-    return res.send("Hello world");
-});
+//Main router
+app.use('/api/category', categoryRouter);
+app.use('/api/product', productRouter);
+app.use('./api/cart', cartRouter);
 
-// Start server
+// Start running server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

@@ -1,7 +1,7 @@
 const Category = require("../models/Category");
 const slugify = require("slugify");
 
-const createdCategory = async (req, res) => {
+const createCategory = async (req, res) => {
     try {
         const userId = req.user.userId;
         if (!userId) return res.status(400).json({success: false, message: "You have to log in first"});
@@ -44,18 +44,19 @@ const updateCategory = async (req, res) => {
         const userId = req.user.userId;
         if (!userId) return res.status(400).json({success: false, message: "You have to log in first"});
 
-        const id = req.params;
-        const {name, description, image, parent, isActive} = req.body;
+        const { id } = req.params;
+        const {name, description, parent} = req.body;
         
         const category = await Category.findById(id);
         if(!category) return res.status(404).json({success: false, message: "Category not found"});
-
-        if(name) {
+        
+        //Update category
+        if(name !== undefined) {
             category.name = name;
             category.slug = slugify(name, {lower: true, strict: true});
         }
         if(description !== undefined) category.description = description;
-        if(image !== undefined) category.image = `uploads/${req.file ? req.file.filename : ""}`;
+        if(req.file) category.image = `uploads/${req.file ? req.file.filename : ""}`;
         if(parent !== undefined) {
             if(parent) {
                 const parentCategory = await Category.findById(parent);
@@ -69,7 +70,7 @@ const updateCategory = async (req, res) => {
         }
 
         await category.save();
-        return res.status(200).json({success: false, message: "Update category successfully"});
+        return res.status(200).json({success: true, message: "Update category successfully", category});
     } catch (err) {
         console.log(err);
         return res.status(500).json({success: false, message: "Internal sever error"});
@@ -94,7 +95,7 @@ const deleteCategory = async (req, res) => {
         const userId = req.user.userId;
         if (!userId) return res.status(400).json({success: false, message: "You have to log in first"});
 
-        const id = req.params;
+        const { id } = req.params;
         const category = await Category.findById(id);
         if(!category) return res.status(404).json({success: false, message: "Category not found"});
 
@@ -103,11 +104,11 @@ const deleteCategory = async (req, res) => {
         if(childCategories.length !== 0) return res.status(400).json({success: false, message: "Can not delete category that has child category"});
 
         await category.deleteOne();
-        return res.status(200).json({success: false, message: "Delete category successfully"});
+        return res.status(200).json({success: true, message: "Delete category successfully"});
     } catch (err) {
         console.log(err);
         return res.status(500).json({success: false, message: "Internal sever error"});
     }
 }
 
-module.exports = { createdCategory, updateCategory, getCategory, deleteCategory };
+module.exports = { createCategory, updateCategory, getCategory, deleteCategory };

@@ -49,7 +49,18 @@ const productSchema = new Schema(
       type: Number,
       min: 0,
     },
-    variants: [productVariantSchema],
+    variants: [
+      {
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        stock: { type: Number, required: true, default: 0 },
+        sku: { type: String },
+        attributes: {
+          type: Map,
+          of: Schema.Types.Mixed,
+        },
+      },
+    ],
     stock: {
       type: Number,
       required: true,
