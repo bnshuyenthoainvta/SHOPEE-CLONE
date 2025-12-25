@@ -36,7 +36,7 @@ coverage/
 
 # Upload files (tùy dự án)
 uploads/
-public/uploads/
+public/uploads/ 
 
 # Temporary files
 tmp/

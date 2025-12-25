@@ -8,6 +8,7 @@ const PORT = 3500;
 
 //Link router
 const userRouter = require('./route/User');
+const categoryRouter = require("./route/Category");
 
 //Link middleware
 const verifyToken = require('./middleware/verifyToken');
@@ -28,8 +29,9 @@ const DBconnect = async() => {
 };
 DBconnect();
 
-//Router
+//Main router
 app.use('/api/user', userRouter);
+app.use('/api/category', categoryRouter);
 
 //Verify Middleware
 app.use(verifyToken);

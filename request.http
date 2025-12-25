@@ -20,7 +20,7 @@ Content-Type: application/json
 ###
 //Test verify token
 GET http://www.localhost:3500/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJJZCI6IjY5NDI2Njk2NjMwZTkwMzUzYjhkMDk2YSJ9LCJpYXQiOjE3NjU5NjA5ODUsImV4cCI6MTc2NTk2MTU4NX0.T1fxisksF5tKxWMNiR087pkzgfUuLt0galEF3r0VCAU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImVtYWlsIjoidHVhbmFuaEBnbWFpbC5jb20iLCJ1c2VySWQiOiI2OTQ5M2UyNDljYzA3ZDIyN2ViNzhlMTcifSwiaWF0IjoxNzY2NDA3NzI5LCJleHAiOjE3NjY0MDgzMjl9.OO0ZAnRSOcaBp_801RpIr-O9AsMYtl3RY09YvBATR5s
 
 
 ###
