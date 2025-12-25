@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
 
-/* ---------- Cart Item Schema ---------- */ //Để tham khảo lưu trong cartSchema
+/* ---------- Cart Item Schema ---------- */ 
+// Tác dụng là thiết kế mẫu sản phẩm để lưu trong items type của cartSchema
 const cartItemSchema = new Schema({
   product: {
     type: Schema.Types.ObjectId,
@@ -37,7 +38,7 @@ const cartSchema = new Schema(
       index: true,
     },
     items: {
-      type: [cartItemSchema],
+      type: cartItemSchema,
       default: [],
     },
     totalAmount: {

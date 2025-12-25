@@ -12,7 +12,7 @@ const verifyToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_SECRET_TOKEN);
-        req.user = decoded;
+        req.user = decoded.user;
         next();
     } catch (err) {
         return res.status(500).json({success: false, message: 'Internal server error'});

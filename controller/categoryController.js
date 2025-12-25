@@ -6,7 +6,7 @@ const createCategory = async (req, res) => {
         const userId = req.user.userId;
         if (!userId) return res.status(400).json({success: false, message: "You have to log in first"});
 
-        const {name, description, image, parent} = req.body;
+        const {name, description, parent} = req.body;
         if(!name) return res.status(400).json({success: false, message: "Category name are required"});
         //Slug name
         const slug = slugify(name, {lower: true, strict: true});

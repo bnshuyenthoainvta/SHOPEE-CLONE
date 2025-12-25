@@ -19,11 +19,13 @@ const verifyToken = require('./middleware/verifyToken');
 app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 //Connected mongoose DB
 const DBconnect = async() => {
     try {
         await mongoose.connect(process.env.MONGOOSE_URI);
+        console.log(`Connect to mongoDB successfully`);
     } catch (err) {
         console.error("Database connection error:", err);
         process.exit(1); // dừng server nếu lỗi
