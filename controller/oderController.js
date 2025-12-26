@@ -13,7 +13,7 @@ const createOrder = async (req, res) => {
         if(!existedProduct) return res.status(404).json({success: false, message: "Product not found"});
 
         //Kiểm tra xem có mẫu cần mua không
-        const matchVariant = existedProduct.variants.find(variant => variant === items.variant);
+        const matchVariant = existedProduct.variants.find(item => item.name === items.variant);
         if(!matchVariant) return res.status(400).json({success: false, message: "Variant not found"});
 
         //Kiểm tra số lượng hàng có đáp ứng không
@@ -32,7 +32,7 @@ const createOrder = async (req, res) => {
         const orderNumber = `ORD-${timestamp}-${random}`;
 
         //Tạo đơn hàng
-        const order = await Order.create({
+        const order = new Order({
             orderNumber,
             user: userId,
             items,
@@ -42,11 +42,11 @@ const createOrder = async (req, res) => {
             note
         });
 
-
+        await order.save();
         return res.status(200).json({success: true, message: "Create order successfully", order});
     } catch (err) {
         console.log(err);
-        return res.status(500).json({success: false, message: "Internal sever error"});
+        return res.status(500).json({success: false, message: `Internal sever error ${err.message}`});
     }
 }
 
@@ -64,19 +64,25 @@ const getOrder = async (req, res) => {
     }
 }
 
-const deleteOrder = async (req, res) => {
+const cancelOrder = async (req, res) => {
     try {
         const userId = req.user.userId;
         const {id} = req.params;
-        const order = await Order.findById(id);
-        if (!order || order.user.toString() !== userId) return res.status(400).json({success: false, message: "Order not found or conflict"});
+        const {cancelReason} = req.body;
+        if(!cancelReason) return res.status(400).json({success: false, message: "Cancel reason is required"});
+        
+        const order = await Order.findOne({_id: id, user: userId});
+        if(!order) return res.status(404).json({success: false, message: "Order not found"});
 
-        await order.deleteOne();
-        return res.status(200).json({success: true, message: "Delete order successfully"});
+        order.cancelReason = cancelReason;
+        order.orderStatus = "cancelled";
+        await order.save();
+        
+        return res.status(200).json({success: true, message: "Delete order successfully", order});
     } catch (err) {
         console.log(err);
         return res.status(500).json({success: false, message: "Internal sever error"});
     }
 }
 
-module.exports = {createOrder, getOrder, deleteOrder};
+module.exports = {createOrder, getOrder, cancelOrder};

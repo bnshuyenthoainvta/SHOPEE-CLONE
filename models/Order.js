@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
-
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
+
 
 /* ---------- Order Item Schema ---------- */
 const orderItemSchema = new Schema({
@@ -128,19 +128,6 @@ const orderSchema = new Schema(
     }
 );
 
-/* ---------- Generate Order Number ---------- */
-// orderSchema.pre('save', function (next) {
-//     if (!this.orderNumber) {
-//         const timestamp = Date.now().toString(36).toUpperCase();
-//         const random = Math.random()
-//             .toString(36)
-//             .substring(2, 6)
-//             .toUpperCase();
-//         this.orderNumber = `ORD-${timestamp}-${random}`;
-//     }
-//     next();
-// });
-
 /* ---------- Indexes ---------- */
 orderSchema.index({ user: 1, createdAt: -1 });
 orderSchema.index({ orderStatus: 1, createdAt: -1 });
@@ -148,6 +135,4 @@ orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ 'items.seller': 1, createdAt: -1 });
 
 /* ---------- Model ---------- */
-const Order = mongoose.model('Order', orderSchema);
-
-export default Order;
+module.exports = mongoose.model("Order", orderSchema);

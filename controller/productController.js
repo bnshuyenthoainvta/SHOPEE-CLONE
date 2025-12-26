@@ -54,7 +54,7 @@ const createProduct = async (req, res) => {
         return res.status(201).json({success: true, message: "Create new product successfully", product});
     } catch (err) {
         console.log(err);
-        return res.status(500).json({success: false, message: "Internal sever error"});
+        return res.status(500).json({success: false, message: `Internal sever error ${err?.message}`});
     }
 }
 

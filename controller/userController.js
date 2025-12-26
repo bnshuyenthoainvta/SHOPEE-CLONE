@@ -44,7 +44,7 @@ const authUser = async (req, res) => {
                 }
             },
             process.env.ACCESS_SECRET_TOKEN,
-            {expiresIn: '10m'}
+            {expiresIn: '60m'}
         );
 
         res.cookie(
