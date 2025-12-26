@@ -42,6 +42,7 @@ const createOrder = async (req, res) => {
             note
         });
 
+
         return res.status(200).json({success: true, message: "Create order successfully", order});
     } catch (err) {
         console.log(err);
@@ -51,7 +52,12 @@ const createOrder = async (req, res) => {
 
 const getOrder = async (req, res) => {
     try {
+        const userId = req.user.userId;
+        const {id} = req.params;
+        const order = await Order.findById(id);
+        if (!order || order.user.toString() !== userId) return res.status(400).json({success: false, message: "Order not found or conflict"});
 
+        return res.status(200).json({success: true, message: "Get order successfully", order});
     } catch (err) {
         console.log(err);
         return res.status(500).json({success: false, message: "Internal sever error"});
@@ -60,11 +66,17 @@ const getOrder = async (req, res) => {
 
 const deleteOrder = async (req, res) => {
     try {
+        const userId = req.user.userId;
+        const {id} = req.params;
+        const order = await Order.findById(id);
+        if (!order || order.user.toString() !== userId) return res.status(400).json({success: false, message: "Order not found or conflict"});
 
+        await order.deleteOne();
+        return res.status(200).json({success: true, message: "Delete order successfully"});
     } catch (err) {
         console.log(err);
         return res.status(500).json({success: false, message: "Internal sever error"});
     }
 }
 
-module.exports = {createOrder, updateOrder, getOrder, deleteOrder};
+module.exports = {createOrder, getOrder, deleteOrder};

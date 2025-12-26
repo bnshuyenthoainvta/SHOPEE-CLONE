@@ -11,6 +11,7 @@ const userRouter = require('./route/User');
 const categoryRouter = require("./route/Category");
 const productRouter = require("./route/Product");
 const cartRouter = require("./route/Cart");
+const orderRouter = require("./route/Order");
 
 //Link middleware
 const verifyToken = require('./middleware/verifyToken');
@@ -42,7 +43,8 @@ app.use(verifyToken);
 //Main router
 app.use('/api/category', categoryRouter);
 app.use('/api/product', productRouter);
-app.use('./api/cart', cartRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/order', orderRouter);
 
 // Start running server
 app.listen(PORT, () => {
